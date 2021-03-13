@@ -28,8 +28,8 @@ class FuzzyController(ControllerBase):
 
         F1.add_input('relative_heading', np.arange(-180, 180, 1), 3)
         F1.add_input('distance', np.arange(0, 1, 0.1), 3)
-        F1.add_input('closure_rate', np.arange(0, 1, 0.1), 3)
-        F1.add_output('turn_rate', np.arange(-1, 1, 0.1), 3)
+        F1.add_input('closure_rate', np.arange(-1, 1, 0.1), 3)
+        F1.add_output('turn_rate', np.arange(-180, 180, 0.1), 3)
 
         v_str = ['relative_heading', 'distance', 'closure_rate', 'turn_rate']
         mfs3 = ['poor', 'average', 'good']
@@ -43,6 +43,26 @@ class FuzzyController(ControllerBase):
         F1.generate_mamdani_rule(rules_all)
         self.F1 = F1
 
+        F2 = HeiTerry_FIS()
+        rule_base = chromosome[1]
+
+        F2.add_input('relative_heading', np.arange(-180, 180, 1), 3)
+        F2.add_input('distance', np.arange(0, 1, 0.1), 3)
+        F2.add_input('closure_rate', np.arange(-1, 1, 0.1), 3)
+        F2.add_output('velocity', np.arange(-1.0, 1.0, 0.1), 3)
+
+        v_str = ['relative_heading', 'distance', 'closure_rate', 'velocity']
+        mfs3 = ['poor', 'average', 'good']
+        # Find a way to automate finding num rules per input earlier and for num inputs
+        rules_all = []
+        for wow in range(3):
+            for gee in range(3):
+                for zoop in range(3):
+                    rules_all.append([[[v_str[0], mfs3[wow]], [v_str[1], mfs3[gee]], [v_str[2], mfs3[zoop]]],
+                                      ['AND'], [v_str[3], str(rule_base[(wow * 3 * 3) + (gee * 3) + (zoop + 1)])]])
+        F2.generate_mamdani_rule(rules_all)
+        self.F2 = F2
+
         pass
 
     def actions(self, ship: SpaceShip, input_data: Dict[str, Tuple]) -> None:
@@ -55,7 +75,7 @@ class FuzzyController(ControllerBase):
         :param ship: Object to use when controlling the SpaceShip
         :param input_data: Input data which describes the current state of the environment
         """
-
+        print(ship.velocity)
         ## Calculate center of 3 clusters
         num_asteroids = len(input_data['asteroids'])
         X = np.ndarray((num_asteroids,2))
@@ -69,8 +89,11 @@ class FuzzyController(ControllerBase):
         del X
         # could probably delete line 69
 
+        # heading is -180 to 180, distance 0 to 1, closure rate -1 to 1
         ins = [['relative_heading', 0], ['distance', 0], ['closure_rate', 0]]
         ship.turn_rate = self.F1.compute(ins, 'turn_rate')
+        commanded_velocity = self.F2.compute(ins, 'velocity')
+
 
         # ship.turn_rate = 180.0
         ship.thrust = ship.thrust_range[1]
