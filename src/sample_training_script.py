@@ -1,5 +1,5 @@
 from fuzzy_asteroids.fuzzy_asteroids import TrainerEnvironment
-
+import numpy as np
 from src.sample_controller import FuzzyController
 from sample_score import SampleScore
 from GA.continousGeneticAlgorithm import CGA
@@ -7,7 +7,7 @@ from GA.selectionFunctions import basicSelection
 from GA.crossoverFunctions import basicCrossover
 from GA.mutationFunctions import basicMutation
 from GA.elitismFunctions import basicElitism
-
+from fuzzy_tools.CustomFIS import HeiTerry_FIS
 
 if __name__ == "__main__":
     # Available settings
@@ -28,8 +28,7 @@ if __name__ == "__main__":
     asteroid_ga = CGA.__init__(3,3,100,0.6,0.4,0.5,69)
 
 
-    def fitnessFunction(chromosome, bounds):
-        FuzzyController = chromosome
+    def fitnessFunction(FuzzyController, bounds):
         #bounds????
         score = game.run(controller=FuzzyController, score=SampleScore())
         return score
