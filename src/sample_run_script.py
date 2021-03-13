@@ -16,7 +16,7 @@ if __name__ == "__main__":
     }
 
     # Whether the users controller should be run
-    run_with_controller = 0
+    run_with_controller = 1
 
     # Run with FuzzyController
     if run_with_controller:
