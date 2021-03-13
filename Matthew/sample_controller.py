@@ -175,7 +175,7 @@ class FuzzyController(ControllerBase):
                         avoidanceFisInputs.append(findFISInputs(c, ship, asteriod))
         print(avoidanceFisInputs)
 
-        show = True
+        """show = True
         if show:
             # set grid positions
             ox, oy = [], []
@@ -210,7 +210,7 @@ class FuzzyController(ControllerBase):
             ax.axis("equal")
             plt.pause(0.03)
             fig.show()
-            plt.close()
+            plt.close()"""
         ship.turn_rate = 180
         ship.thrust = ship.thrust_range[1]
         ship.shoot()

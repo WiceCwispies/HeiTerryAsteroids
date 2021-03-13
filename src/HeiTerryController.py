@@ -3,6 +3,7 @@ import numpy as np
 from fuzzy_asteroids.fuzzy_controller import ControllerBase, SpaceShip
 from fuzzy_tools.fuzzy_c_means import c_means
 from fuzzy_tools.CustomFIS import HeiTerry_FIS
+from fuzzy_tools.circle_functions import findFISInputs, distanceFormula, inRectangle
 
 
 class FuzzyController(ControllerBase):
@@ -24,9 +25,9 @@ class FuzzyController(ControllerBase):
         Create your fuzzy logic controllers and other objects here
         """
         chromosome = [[1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0,
-                      1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0],
-                    [1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0,
-                      1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0] ]
+                       1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0],
+                      [1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0,
+                       1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0]]
 
         self.A1 = HeiTerry_FIS()
         rule_base = chromosome[0]
@@ -47,8 +48,8 @@ class FuzzyController(ControllerBase):
             for gee in range(3):
                 for zoop in range(3):
                     rules_all.append([[[v_str[0], mfs3[wow]], [v_str[1], mfs3[gee]], [v_str[2], mfs3[zoop]]],
-                                    ['AND'], [[v_str[3], str(rule_base[(wow * 3 * 3) + (gee * 3) + zoop])], 
-                                    [v_str[4], str(rule_base[27 + (wow * 3 * 3) + (gee * 3) + zoop])]]])
+                                      ['AND'], [[v_str[3], str(rule_base[(wow * 3 * 3) + (gee * 3) + zoop])],
+                                                [v_str[4], str(rule_base[27 + (wow * 3 * 3) + (gee * 3) + zoop])]]])
 
         self.A1.generate_mamdani_rule(rules_all)
 
@@ -72,8 +73,8 @@ class FuzzyController(ControllerBase):
             for gee in range(3):
                 for zoop in range(3):
                     rules_all.append([[[v_str[0], mfs3[wow]], [v_str[1], mfs3[gee]], [v_str[2], mfs3[zoop]]],
-                                    ['AND'], [[v_str[3], str(rule_base[(wow * 3 * 3) + (gee * 3) + zoop])], 
-                                    [v_str[4], str(rule_base[27 + (wow * 3 * 3) + (gee * 3) + zoop])]]])
+                                      ['AND'], [[v_str[3], str(rule_base[(wow * 3 * 3) + (gee * 3) + zoop])],
+                                                [v_str[4], str(rule_base[27 + (wow * 3 * 3) + (gee * 3) + zoop])]]])
 
         self.C1.generate_mamdani_rule(rules_all)
 
@@ -87,45 +88,58 @@ class FuzzyController(ControllerBase):
         :param ship: Object to use when controlling the SpaceShip
         :param input_data: Input data which describes the current state of the environment
         """
-        ## Calculate center of 3 clusters
-        num_asteroids = len(input_data['asteroids'])
-        X = np.ndarray((num_asteroids,2))
-        for e in range(num_asteroids):
-            X[e] = [input_data['asteroids'][e]['position'][0], input_data['asteroids'][e]['position'][1]]
-        try:
-            centers = c_means(X, nodes=3)
-        except:
-            centers = None
-        # print(centers)
+
+        #### MAIN ####
+        # ship positions
+        x, y = ship.position
+        sx = x  # [m]
+        sy = y  # [m]
+
+        # asteriod positions
+        asteriods = []
+        for x in input_data['asteroids']:
+            asteriods.append([x['position'], x['velocity']])
+
+        circles = []
+        ychange = 600
+        xchange = 800
+        radius = 150
+        circles.append([(sx, sy), radius, 1])
+        circles.append([(sx + xchange, sy), radius, 0])
+        circles.append([(sx, sy + ychange), radius, 0])
+        circles.append([(sx + xchange, sy + ychange), radius, 0])
+        circles.append([(sx - xchange, sy + ychange), radius, 0])
+        circles.append([(sx - xchange, sy), radius, 0])
+        circles.append([(sx - xchange, sy - ychange), radius, 0])
+        circles.append([(sx, sy - ychange), radius, 0])
+        circles.append([(sx + xchange, sy - ychange), radius, 0])
+
+        circles = list(map(lambda a: inRectangle(a), circles))
+
+        avoidanceFisInputs = []
+        for c in circles:
+            if c[2] == 1:
+                for asteriod in asteriods:
+                    if distanceFormula(asteriod[0], c[0]) < c[1]:
+                        avoidanceFisInputs.append(findFISInputs(c, ship, asteriod))
+        #distance, relative heading, closure rate
 
 
-        # heading is -180 to 180, distance 0 to 1, closure rate -1 to 1
-        ins = [['relative_heading', 80], ['distance', 0.2], ['closure_rate', 0.6]]
-        [turn_rate, thrust] = self.A1.compute2Plus(ins, ['turn_rate', 'thrust'])
-        
-        ship.turn_rate = turn_rate
-        if thrust > 0.2: ship.thrust = ship.thrust_range[1]
-        elif thrust < -0.2: ship.thrust = ship.thrust_range[0]
+        turn_each = []
+        thrust_each = []
+        for each_asteroid in avoidanceFisInputs:
+            ins = [['relative_heading', each_asteroid[1]], ['distance', each_asteroid[0]], ['closure_rate', each_asteroid[2]]]
+            [turn1, thrust1] = self.A1.compute2Plus(ins, ['turn_rate', 'thrust'])
+            [turn2, thrust2] = self.C1.compute2Plus(ins, ['turn_rate', 'thrust'])
+            turn_each.append(turn1)
+            turn_each.append(turn2)
+            thrust_each.append(thrust1)
+            thrust_each.append(thrust2)
+        ship.turn_rate = np.average(turn_each)
+
+        thrust = np.average(thrust_each)
+        if thrust > 0.25: ship.thrust = ship.thrust_range[1]
+        elif thrust < -0.25: ship.thrust = ship.thrust_range[0]
         else: ship.thrust = 0
-        ship.thrust = 0
 
-        # print(ship.angle % 360)
-        xa = 400 # asteroid x
-        ya = 200 # asteroid y
-        xv = ship.position[0]
-        yv = ship.position[1]
-        ang = np.radians(ship.angle % 360)
-        """print(np.arccos((-np.sin(ang)*(xa-xv) + np.cos(ang)*(ya-yv))/((((xa-xv)**2)+((ya-yv)**2))**0.5)))
-        relative_heading = np.degrees(np.arccos((-np.sin(ang)*(xa-xv) + np.cos(ang)*(ya-yv))/((((xa-xv)**2)+((ya-yv)**2))**0.5)))
-        """
-
-        dot = -np.sin(ang) * (xa-xv) + (np.cos(ang)) * (ya-yv)  # dot product
-        det = -np.sin(ang) * (ya-yv) - (np.cos(ang)) * (xa-xv)  # determinant
-        angle = np.degrees(np.arctan2(det, dot)) # atan2(y, x) or atan2(sin, cos)
-        if angle < 0:
-            angle += 360
-        relative_heading = -angle+360
-
-
-        ship.turn_rate = 40.0
         ship.shoot()
