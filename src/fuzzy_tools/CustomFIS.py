@@ -220,8 +220,8 @@ def main():
     FIS.add_output('bankaccount', np.arange(0,28,1), [[0, 0, 13], [0, 13, 25], [13, 25, 25]])
 
     rules = [
-        [[['quality','poor'],['service','poor']], ['OR'], [['tip', '0'], ['bankaccount', '0']]],
-        [[['service','average']], ['OR'], [['tip', '1'], ['bankaccount', '1']]],
+        [[['quality','poor'],['service','poor']], ['OR'], [['tip', '0'], ['bankaccount', '2']]],
+        [[['service','average']], ['OR'], [['tip', '1'], ['bankaccount', '2']]],
         [[['quality','good'], ['service','good']], ['OR'], [['tip', '2'], ['bankaccount', '2']]]
     ]
 
