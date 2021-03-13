@@ -24,8 +24,10 @@ class FuzzyController(ControllerBase):
         """
         Create your fuzzy logic controllers and other objects here
         """
-        chromosome = [[1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0],
-                      [1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0]]
+        chromosome = [[1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0,
+                       1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0],
+                      [1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0,
+                       1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0]]
 
         self.A1 = HeiTerry_FIS()
         rule_base = chromosome[0]
@@ -34,80 +36,47 @@ class FuzzyController(ControllerBase):
         self.A1.add_input('distance', np.arange(0.0, 1.0, 0.1), 3)
         self.A1.add_input('closure_rate', np.arange(-1.0, 1.0, 0.1), 3)
         turn_rate_mems = [[-180.0, -180.0, 0.0], [-180.0, 0.0, 180.0], [0.0, 180.0, 180.0]]
-        self.A1.add_output('turn_rate', np.arange(-180.0, 180.0, 1.0), turn_rate_mems)
-
-        v_str = ['relative_heading', 'distance', 'closure_rate', 'turn_rate']
-        mfs3 = ['poor', 'average', 'good']
-        # Find a way to automate finding num rules per input earlier and for num inputs
-        rules_all = []
-        for wow in range(3):
-            for gee in range(3):
-                for zoop in range(3):
-                    rules_all.append([[[v_str[0], mfs3[wow]], [v_str[1], mfs3[gee]], [v_str[2], mfs3[zoop]]],
-                                      ['AND'], [v_str[3], str(rule_base[(wow * 3 * 3) + (gee * 3) + (zoop + 1) - 1])]])
-        self.A1.generate_mamdani_rule(rules_all)
-
-        self.A2 = HeiTerry_FIS()
-        rule_base = chromosome[1]
-
-        self.A2.add_input('relative_heading', np.arange(-180, 180, 1), 3)
-        self.A2.add_input('distance', np.arange(0, 1, 0.1), 3)
-        self.A2.add_input('closure_rate', np.arange(-1, 1, 0.1), 3)
         thrust_mems = [[-1.0, -1.0, 0], [-0.5, 0, 0.5], [0.0, 1.0, 1.0]]
-        self.A2.add_output('thrust', np.arange(-4.0, 4.0, 0.1), thrust_mems)
+        self.A1.add_output('turn_rate', np.arange(-180.0, 180.0, 1.0), turn_rate_mems)
+        self.A1.add_output('thrust', np.arange(-4.0, 4.0, 0.1), thrust_mems)
 
-        v_str = ['relative_heading', 'distance', 'closure_rate', 'thrust']
-        mfs3 = ['poor', 'average', 'good']
+        v_str = ['relative_heading', 'distance', 'closure_rate', 'turn_rate', 'thrust']
+        mfs3 = ['0', '1', '2']
         # Find a way to automate finding num rules per input earlier and for num inputs
         rules_all = []
         for wow in range(3):
             for gee in range(3):
                 for zoop in range(3):
                     rules_all.append([[[v_str[0], mfs3[wow]], [v_str[1], mfs3[gee]], [v_str[2], mfs3[zoop]]],
-                                      ['AND'], [v_str[3], str(rule_base[(wow * 3 * 3) + (gee * 3) + (zoop + 1) - 1])]])
-        self.A2.generate_mamdani_rule(rules_all)
+                                      ['AND'], [[v_str[3], str(rule_base[(wow * 3 * 3) + (gee * 3) + zoop])],
+                                                [v_str[4], str(rule_base[27 + (wow * 3 * 3) + (gee * 3) + zoop])]]])
+
+        self.A1.generate_mamdani_rule(rules_all)
 
         # CLUSTER AVOIDANCE
         self.C1 = HeiTerry_FIS()
-        rule_base = chromosome[0]
+        rule_base = chromosome[1]
 
         self.C1.add_input('relative_heading', np.arange(-180.0, 180.0, 1.0), 3)
         self.C1.add_input('distance', np.arange(0.0, 1.0, 0.1), 3)
         self.C1.add_input('closure_rate', np.arange(-1.0, 1.0, 0.1), 3)
         turn_rate_mems = [[-180.0, -180.0, 0.0], [-180.0, 0.0, 180.0], [0.0, 180.0, 180.0]]
-        self.C1.add_output('turn_rate', np.arange(-180.0, 180.0, 1.0), turn_rate_mems)
-
-        v_str = ['relative_heading', 'distance', 'closure_rate', 'turn_rate']
-        mfs3 = ['poor', 'average', 'good']
-        # Find a way to automate finding num rules per input earlier and for num inputs
-        rules_all = []
-        for wow in range(3):
-            for gee in range(3):
-                for zoop in range(3):
-                    rules_all.append([[[v_str[0], mfs3[wow]], [v_str[1], mfs3[gee]], [v_str[2], mfs3[zoop]]],
-                                      ['AND'], [v_str[3], str(rule_base[(wow * 3 * 3) + (gee * 3) + (zoop + 1) - 1])]])
-        self.C1.generate_mamdani_rule(rules_all)
-
-        self.C2 = HeiTerry_FIS()
-        rule_base = chromosome[1]
-
-        self.C2.add_input('relative_heading', np.arange(-180, 180, 1), 3)
-        self.C2.add_input('distance', np.arange(0, 1, 0.1), 3)
-        self.C2.add_input('closure_rate', np.arange(-1, 1, 0.1), 3)
         thrust_mems = [[-1.0, -1.0, 0], [-0.5, 0, 0.5], [0.0, 1.0, 1.0]]
-        self.C2.add_output('thrust', np.arange(-4.0, 4.0, 0.1), thrust_mems)
+        self.C1.add_output('turn_rate', np.arange(-180.0, 180.0, 1.0), turn_rate_mems)
+        self.C1.add_output('thrust', np.arange(-4.0, 4.0, 0.1), thrust_mems)
 
-        v_str = ['relative_heading', 'distance', 'closure_rate', 'thrust']
-        mfs3 = ['poor', 'average', 'good']
+        v_str = ['relative_heading', 'distance', 'closure_rate', 'turn_rate', 'thrust']
+        mfs3 = ['0', '1', '2']
         # Find a way to automate finding num rules per input earlier and for num inputs
         rules_all = []
         for wow in range(3):
             for gee in range(3):
                 for zoop in range(3):
                     rules_all.append([[[v_str[0], mfs3[wow]], [v_str[1], mfs3[gee]], [v_str[2], mfs3[zoop]]],
-                                      ['AND'], [v_str[3], str(rule_base[(wow * 3 * 3) + (gee * 3) + (zoop + 1) - 1])]])
-        self.C2.generate_mamdani_rule(rules_all)
+                                      ['AND'], [[v_str[3], str(rule_base[(wow * 3 * 3) + (gee * 3) + zoop])],
+                                                [v_str[4], str(rule_base[27 + (wow * 3 * 3) + (gee * 3) + zoop])]]])
 
+        self.C1.generate_mamdani_rule(rules_all)
 
     def actions(self, ship: SpaceShip, input_data: Dict[str, Tuple]) -> None:
         """
@@ -160,12 +129,12 @@ class FuzzyController(ControllerBase):
         thrust_each = []
         for each_asteroid in avoidanceFisInputs:
             ins = [['relative_heading', each_asteroid[1]], ['distance', each_asteroid[0]], ['closure_rate', each_asteroid[2]]]
-            [turn1, thrust1] = self.A1.compute(ins, 'turn_rate')
-            [turn2, thrust2] = self.C1.compute(ins, 'turn_rate')
-            turn_each.append(turn1, turn2)
-            thrust_each.append(thrust1, thrust2)
-            """turn_each.append(self.C1.compute(ins, 'turn_rate'))
-            thrust_each.append(self.C1.compute(ins, 'thrust'))"""
+            [turn1, thrust1] = self.A1.compute2Plus(ins, ['turn_rate', 'thrust'])
+            [turn2, thrust2] = self.C1.compute2Plus(ins, ['turn_rate', 'thrust'])
+            turn_each.append(turn1)
+            turn_each.append(turn2)
+            thrust_each.append(thrust1)
+            thrust_each.append(thrust2)
         ship.turn_rate = np.average(turn_each)
 
         thrust = np.average(thrust_each)
