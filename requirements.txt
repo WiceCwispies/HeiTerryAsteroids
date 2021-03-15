@@ -1,1 +1,2 @@
 arcade==2.5.1
+fuzzy-c-means

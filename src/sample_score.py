@@ -31,4 +31,6 @@ class SampleScore(Score):
         :param environment: AsteroidGame environment instance
         """
 
+        self.fitness = score.evaluation_times
+
         self.average_number_asteroids = sum(self.number_asteroids)/self.frame_count
