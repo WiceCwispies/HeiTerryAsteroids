@@ -30,6 +30,46 @@ def basicCrossover(parent1,parent2,nGenes,PC):
     #print(parent2,"\n",parent1)
     return parent1, parent2
 
+def AsteriodsCrossoverRand1Point(parent1, parent2, nGenes, PC, bounds):
+    parent1 = parent1.getString()
+    p1_rb1 = parent1[0]
+    p1_rb2 = parent1[1]
+
+    parent2 = parent2.getString()
+    p2_rb1 = parent2[0]
+    p2_rb2 = parent2[1]
+    child1 = []
+    child2 = []
+
+    def randPointCross(string1, string2):
+        leng = len(string1)
+        ranInt = random.randint(0, leng - 2)
+        ranInt2 = random.randint(ranInt, leng - 1)
+        child1 = string1[0:ranInt] + string2[ranInt:ranInt2] + string1[ranInt2:leng]
+        child2 = string2[0:ranInt] + string1[ranInt:ranInt2] + string2[ranInt2:leng]
+        return child1, child2
+
+
+    # crossover rule base
+    c1_rb1, c2_rb1 = randPointCross(p1_rb1, p2_rb1)
+    c1_rb2, c2_rb2 = randPointCross(p1_rb2, p2_rb2)
+
+    child1 = [c1_rb1, c1_rb2]
+    child2 = [c2_rb1, c2_rb2]
+
+    rand = random.random()
+    if rand <= PC:
+        child1 = Chromosome(child1)
+    else:
+        child1 = Chromosome(parent1)
+
+    rand = random.random()
+    if rand <= PC:
+        child2 = Chromosome(child2)
+    else:
+        child2 = Chromosome(parent2)
+
+    return child1, child2
 
 def tipCrossoverRand1Point(parent1, parent2, nGenes, PC, bonuds):
     parent1 = parent1.getString()

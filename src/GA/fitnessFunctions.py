@@ -1,10 +1,16 @@
 import numpy as np
-from chromosome import *
+#from chromosome import *
 import csv
-from FISClasses import FIS
-from sklearn.metrics import mean_squared_error
+#from FISClasses import FIS
+#from sklearn.metrics import mean_squared_error
 import threading
-from CustomFIS import HeiTerry_FIS
+import sys
+sys.path.append("..")
+
+from fuzzy_tools import CustomFIS
+
+def AsteriodFitness():
+    pass
 
 def fitnessOf1(x):
     print(x+7)

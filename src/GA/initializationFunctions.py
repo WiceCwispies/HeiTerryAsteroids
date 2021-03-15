@@ -2,6 +2,12 @@ import numpy as np
 import random
 from chromosome import *
 
+def asteriodInitialize(numbChroms, numbGenes, bounds):
+    population = []
+    for i in range(numbChroms):
+        population.append(Chromosome(np.random.randint(3, size=(2, 27)).tolist()))
+    return population
+
 # Generic CGA Initialization Function
 up = 7
 lw = -7
@@ -56,4 +62,4 @@ def tipInitialize(numbChroms, numbGenes, bounds):
     return population
 
 if __name__ == "__main__":
-    CGAInitialize(10,7)
+    asteriodInitialize(10, 7, [1, 2])
