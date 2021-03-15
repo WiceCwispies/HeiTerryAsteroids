@@ -3,7 +3,7 @@ import numpy as np
 from fuzzy_asteroids.fuzzy_controller import ControllerBase, SpaceShip
 from fuzzy_tools.fuzzy_c_means import c_means
 from fuzzy_tools.CustomFIS import HeiTerry_FIS
-from fuzzy_tools.circle_functions import findFISInputs, distanceFormula, inRectangle
+from fuzzy_tools.circle_functions import findFISInputs, distanceFormula, inRectangle, findClusterInputs
 
 
 class FuzzyController(ControllerBase):
@@ -20,14 +20,14 @@ class FuzzyController(ControllerBase):
 
     By defining these interfaces, this class will work correctly
     """
-    def __init__(self):
+    def __init__(self, chromosome):
         """
         Create your fuzzy logic controllers and other objects here
         """
-        chromosome = [[1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0,
+        """chromosome = [[1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0,
                        1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0],
                       [1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0,
-                       1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0]]
+                       1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0]]"""
 
         self.A1 = HeiTerry_FIS()
         rule_base = chromosome[0]
@@ -124,22 +124,39 @@ class FuzzyController(ControllerBase):
                         avoidanceFisInputs.append(findFISInputs(c, ship, asteriod))
         #distance, relative heading, closure rate
 
+        num_asteroids = len(input_data['asteroids'])
+        X = np.ndarray((num_asteroids, 2))
+        for e in range(num_asteroids):
+            X[e] = [input_data['asteroids'][e]['position'][0], input_data['asteroids'][e]['position'][1]]
+        try:
+            centers = c_means(X, nodes=3)
+        except:
+            centers = None
+
+        clusterFisInputs = []
+        for each_center in centers:
+            clusterFisInputs.append(findClusterInputs(ship, each_center))
+        # distance, relative heading, closure rate
 
         turn_each = []
         thrust_each = []
         for each_asteroid in avoidanceFisInputs:
             ins = [['relative_heading', each_asteroid[1]], ['distance', each_asteroid[0]], ['closure_rate', each_asteroid[2]]]
             [turn1, thrust1] = self.A1.compute2Plus(ins, ['turn_rate', 'thrust'])
-            [turn2, thrust2] = self.C1.compute2Plus(ins, ['turn_rate', 'thrust'])
             turn_each.append(turn1)
-            turn_each.append(turn2)
             thrust_each.append(thrust1)
+
+        for each_cluster in clusterFisInputs:
+            ins = [['relative_heading', each_cluster[1]], ['distance', each_cluster[0]], ['closure_rate', each_cluster[2]]]
+            [turn2, thrust2] = self.C1.compute2Plus(ins, ['turn_rate', 'thrust'])
+            turn_each.append(turn2)
             thrust_each.append(thrust2)
+
         ship.turn_rate = np.average(turn_each)
 
         thrust = np.average(thrust_each)
-        if thrust > 0.25: ship.thrust = ship.thrust_range[1]
-        elif thrust < -0.25: ship.thrust = ship.thrust_range[0]
+        if thrust > 0.2: ship.thrust = ship.thrust_range[1]
+        elif thrust < -0.2: ship.thrust = ship.thrust_range[0]
         else: ship.thrust = 0
 
         ship.shoot()

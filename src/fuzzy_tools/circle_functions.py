@@ -105,28 +105,19 @@ def findFISInputs(circle, ship, asteriod):
 
     return [distance, relative_heading, closureRate]
 
-def findClusterInputs(circle, ship, cluster):
-    ship_pos = circle[0]
-    r = circle[1]
+def findClusterInputs(ship, cluster):
+    ship_pos = ship.position
     ship_vel = ship.velocity
-    ship_angle = ship.angle
-    a = cluster
 
-    distance = distanceFormula(ship_pos, a)
-    m = np.degrees(np.tan(ship_angle))
-    b = m * ship_pos[0] - ship_pos[1]
-    L1 = ship_pos
-    L2 = [ship_pos[0] + 1, m * (ship_pos[0] + 1) + b]
-    plDistance = pointLineDistance(L1, L2, a)
-    theta = np.degrees(np.arcsin(plDistance / distance))
+    distance = distanceFormula(ship_pos, cluster)
 
     future_ship_pos = [ship_pos[0] + ship_vel[0], ship_pos[1] + ship_vel[1]]
-    future_asteriod_pos = [a[0], a[1]]
-    futureDistance = distanceFormula(future_ship_pos, future_asteriod_pos)
+    future_cluster_pos = [cluster[0], cluster[1]]
+    futureDistance = distanceFormula(future_ship_pos, future_cluster_pos)
     closureRate = distance - futureDistance
 
-    xa = a[0]  # asteroid x
-    ya = a[1]  # asteroid y
+    xa = cluster[0]  # asteroid x
+    ya = cluster[1]  # asteroid y
     xv = ship.position[0]
     yv = ship.position[1]
     ang = np.radians(ship.angle % 360)

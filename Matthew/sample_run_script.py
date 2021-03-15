@@ -1,7 +1,7 @@
 from fuzzy_asteroids.fuzzy_asteroids import AsteroidGame, FuzzyAsteroidGame
 from fuzzy_asteroids.util import Scenario
 
-from sample_controller import FuzzyController
+from HeiTerryController import FuzzyController
 from sample_score import SampleScore
 
 
@@ -24,7 +24,12 @@ if __name__ == "__main__":
     if run_with_controller:
         # Instantiate the environment
         game = FuzzyAsteroidGame(settings=settings)
-        score = game.run(controller=FuzzyController())
+
+        chromosome = [[1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0,
+                       1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0],
+                      [1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0,
+                       1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0]]
+        score = game.run(controller=FuzzyController(chromosome))
 
     else:
         # Run the Asteroids game with no ai
