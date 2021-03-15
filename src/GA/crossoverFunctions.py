@@ -1,5 +1,5 @@
 import numpy as np
-from chromosome import *
+from GA.chromosome import *
 import random
 
 up = 7

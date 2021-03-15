@@ -1,11 +1,11 @@
 import numpy as np
 import random
-from chromosome import *
+from GA.chromosome import *
 
 def asteriodInitialize(numbChroms, numbGenes, bounds):
     population = []
     for i in range(numbChroms):
-        population.append(Chromosome(np.random.randint(3, size=(2, 27)).tolist()))
+        population.append(Chromosome(np.random.randint(3, size=(2, 54)).tolist()))
     return population
 
 # Generic CGA Initialization Function

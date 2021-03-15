@@ -1,6 +1,5 @@
 import numpy as np
 import sys
-sys.path.append("..")
 from fuzzy_tools import CustomFIS
 from fuzzy_asteroids.fuzzy_asteroids import AsteroidGame, FuzzyAsteroidGame
 from HeiTerryController import FuzzyController
@@ -19,6 +18,9 @@ def AsteriodFitness(chrom, game):
     # }
     #
     # #game = TrainerEnvironment(settings=settings)
+    print(SampleScore)
+    print(FuzzyController(chrom))
+    print(game)
     score = game.run(controller=FuzzyController(chrom), score=SampleScore())
 
     return score.fitness

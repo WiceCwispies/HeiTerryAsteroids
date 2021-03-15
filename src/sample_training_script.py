@@ -24,14 +24,7 @@ if __name__ == "__main__":
     """for i in range(1000):
         # Call run() on an instance of the TrainerEnvironment
         # This function automatically manages cleanup"""
-
-    asteroid_ga = CGA.__init__(3,3,100,0.6,0.4,0.5,69)
-
-
-    def fitnessFunction(FuzzyController, bounds):
-        #bounds????
-        score = game.run(controller=FuzzyController, score=SampleScore())
-        return score
-
-    asteroid_ga.run(basicSelection, basicCrossover, fitnessFunction, basicMutation, basicElitism)
+    for i in range(100):
+        score = game.run(controller=FuzzyController(), score=SampleScore())
+        print(score)
 

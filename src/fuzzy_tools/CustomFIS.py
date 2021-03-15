@@ -59,7 +59,7 @@ class antecedent():
     def autoGenerate(self, numb):
         mems = createUniformInput(1, numb, [self.range[0]], [self.range[-1]], False)[0]
         if numb == 3:
-            classifires = ['poor', 'average', 'good']
+            classifires = ['0', '1', '2']
         
         for i,mf in enumerate(classifires):
             self.mfs[mf] = mems[i]

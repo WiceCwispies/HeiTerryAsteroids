@@ -1,13 +1,13 @@
 import numpy as np
 import matplotlib as mpl
 import random
-from fitnessFunctions import *
-from chromosome import *
-from initializationFunctions import *
-from selectionFunctions import *
-from crossoverFunctions import *
-from mutationFunctions import *
-from elitismFunctions import *
+from GA.fitnessFunctions import *
+from GA.chromosome import *
+from GA.initializationFunctions import *
+from GA.selectionFunctions import *
+from GA.crossoverFunctions import *
+from GA.mutationFunctions import *
+from GA.elitismFunctions import *
 import threading
 
 class CGA:

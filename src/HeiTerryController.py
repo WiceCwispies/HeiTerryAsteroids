@@ -30,6 +30,7 @@ class FuzzyController(ControllerBase):
                        1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0]]"""
 
         self.A1 = HeiTerry_FIS()
+        chromosome = chromosome.getString()
         rule_base = chromosome[0]
 
         self.A1.add_input('relative_heading', np.arange(-180.0, 180.0, 1.0), 3)
@@ -50,6 +51,7 @@ class FuzzyController(ControllerBase):
                     rules_all.append([[[v_str[0], mfs3[wow]], [v_str[1], mfs3[gee]], [v_str[2], mfs3[zoop]]],
                                       ['AND'], [[v_str[3], str(rule_base[(wow * 3 * 3) + (gee * 3) + zoop])],
                                                 [v_str[4], str(rule_base[27 + (wow * 3 * 3) + (gee * 3) + zoop])]]])
+
 
         self.A1.generate_mamdani_rule(rules_all)
 
@@ -134,8 +136,9 @@ class FuzzyController(ControllerBase):
             centers = None
 
         clusterFisInputs = []
-        for each_center in centers:
-            clusterFisInputs.append(findClusterInputs(ship, each_center))
+        if centers is not None:
+            for each_center in centers:
+                clusterFisInputs.append(findClusterInputs(ship, each_center))
         # distance, relative heading, closure rate
 
         turn_each = []
