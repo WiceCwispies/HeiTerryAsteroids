@@ -30,6 +30,16 @@ def tipMutation(chromosome, ngene, PM, bounds):
                 child[x][i][2] = child[x][i][2] + random.uniform(0, 1)
     return Chromosome(child)
 
+def asteriodMutation(chromosome, ngene, PM, bounds):
+    child = chromosome.getString()
+    leng = len(child)
+    for x in range(leng):
+        for i in range(x):
+            R = random.random()
+            if R < PM:
+                child[x][i] = random.randint(0, 2)
+    return Chromosome(child)
+
 def tipMutationTrial(chromosome, ngene, PM, bounds):
     child = chromosome.getString()
     leng = len(child)
