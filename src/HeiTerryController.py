@@ -4,7 +4,7 @@ from fuzzy_asteroids.fuzzy_controller import ControllerBase, SpaceShip
 from fuzzy_tools.fuzzy_c_means import c_means
 from fuzzy_tools.CustomFIS import HeiTerry_FIS
 from fuzzy_tools.circle_functions import findFISInputs, distanceFormula, inRectangle, findClusterInputs
-
+import math
 
 class FuzzyController(ControllerBase):
     """
@@ -155,11 +155,13 @@ class FuzzyController(ControllerBase):
             turn_each.append(turn2)
             thrust_each.append(thrust2)
 
-        ship.turn_rate = np.average(turn_each)
 
-        thrust = np.average(thrust_each)
-        if thrust > 0.2: ship.thrust = ship.thrust_range[1]
+        ship.turn_rate = np.sum(turn_each)/len(turn_each)
+        if thrust_each:
+            thrust = np.sum(thrust_each)/len(thrust_each)
+
+        """if thrust > 0.2: ship.thrust = ship.thrust_range[1]
         elif thrust < -0.2: ship.thrust = ship.thrust_range[0]
-        else: ship.thrust = 0
+        else: ship.thrust = 0"""
 
         ship.shoot()
