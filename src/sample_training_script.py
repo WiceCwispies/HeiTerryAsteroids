@@ -1,13 +1,11 @@
 from fuzzy_asteroids.fuzzy_asteroids import TrainerEnvironment
 import numpy as np
-from src.sample_controller import FuzzyController
 from sample_score import SampleScore
-from GA.continousGeneticAlgorithm import CGA
-from GA.selectionFunctions import basicSelection
-from GA.crossoverFunctions import basicCrossover
-from GA.mutationFunctions import basicMutation
-from GA.elitismFunctions import basicElitism
-from fuzzy_tools.CustomFIS import HeiTerry_FIS
+from GA.chromosome import Chromosome
+from HeiTerryController import FuzzyController
+from fuzzy_asteroids.fuzzy_asteroids import AsteroidGame, FuzzyAsteroidGame
+from fuzzy_asteroids.util import Scenario
+
 
 if __name__ == "__main__":
     # Available settings
@@ -16,15 +14,33 @@ if __name__ == "__main__":
         # "lives": 3,
         # "prints": False,
     }
-
+    """chromosome = [[0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 2, 2, 1, 2, 1, 0, 0, 1, 2, 1, 0, 2, 1, 2, 1, 2, 2, 1, 0, 2, 2, 0, 0, 1, 0,
+      0, 2, 1, 2, 0, 1, 1, 1, 2, 1, 1, 1, 2, 2, 2, 2],
+     [2, 0, 2, 0, 2, 1, 0, 2, 1, 2, 2, 0, 1, 1, 2, 2, 1, 2, 1, 2, 1, 1, 2, 2, 2, 0, 2, 0, 0, 1, 2, 0, 0, 1, 1, 0, 2, 0,
+      1, 2, 2, 0, 2, 0, 0, 0, 2, 0, 1, 0, 2, 2, 2, 0]]"""
+    chromosome = [
+        [1, 0, 2, 2, 1, 0, 0, 2, 2, 0, 0, 1, 1, 1, 0, 1, 2, 2, 2, 2, 2, 2, 2, 0, 1, 1, 2, 2, 0, 0, 2, 2, 0, 1, 1, 1, 1,
+         1, 1, 0, 2, 0, 2, 2, 1, 2, 0, 1, 0, 2, 0, 0, 0, 2],
+        [0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 1, 1, 2, 2, 1, 0, 0, 0, 2, 2, 1, 0, 1, 1, 2, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 2, 2,
+         0, 0, 2, 2, 2, 1, 1, 0, 0, 0, 2, 1, 2, 1, 2, 2, 0]]
+    """chromosome = [
+        [1, 0, 2, 2, 1, 0, 0, 2, 2, 0, 0, 1, 1, 1, 0, 1, 2, 2, 2, 2, 2, 2, 2, 0, 1, 1, 2, 2, 0, 0, 0, 1, 1, 1, 2, 1, 0,
+         1, 1, 0, 2, 0, 2, 2, 1, 2, 0, 1, 0, 2, 0, 0, 0, 2],
+        [0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 1, 1, 2, 2, 1, 0, 0, 0, 2, 2, 1, 0, 1, 0, 1, 2, 2, 1, 1, 0, 1, 1, 0, 0, 1, 2, 2,
+         0, 0, 2, 2, 2, 1, 1, 0, 0, 0, 2, 1, 2, 1, 2, 2, 0]]"""
+    chrom = Chromosome(chromosome)
+    scenario_ast = Scenario(
+        asteroid_states=[{"position": (200, 550), "angle": 84.6, "speed": 25},
+                         {"position": (600, 500), "angle": 169.0, "speed": 40},
+                         {"position": (700, 200), "angle": 46.8, "speed": 30},
+                         {"position": (300, 100), "angle": 135.0, "speed": 50},
+                         {"position": (100, 400), "angle": -26.0, "speed": 42},
+                         {"position": (500, 200), "angle": -96.0, "speed": 25},
+                         ]
+    )
     # To use the controller within the context of a training solution
     # It is important to not create a new instance of the environment everytime
-    game = TrainerEnvironment(settings=settings)
-
-    """for i in range(1000):
-        # Call run() on an instance of the TrainerEnvironment
-        # This function automatically manages cleanup"""
-    for i in range(100):
-        score = game.run(controller=FuzzyController(), score=SampleScore())
-        print(score)
+    game = FuzzyAsteroidGame(settings=settings)
+    score = game.run(controller=FuzzyController(chrom), score=SampleScore(), scenario=scenario_ast)
+    print(score.time)
 

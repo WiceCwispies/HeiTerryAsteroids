@@ -141,27 +141,26 @@ class FuzzyController(ControllerBase):
                 clusterFisInputs.append(findClusterInputs(ship, each_center))
         # distance, relative heading, closure rate
 
-        turn_each = []
+        turn_rate_each = []
         thrust_each = []
         for each_asteroid in avoidanceFisInputs:
             ins = [['relative_heading', each_asteroid[1]], ['distance', each_asteroid[0]], ['closure_rate', each_asteroid[2]]]
             [turn1, thrust1] = self.A1.compute2Plus(ins, ['turn_rate', 'thrust'])
-            turn_each.append(turn1)
+            turn_rate_each.append(turn1)
             thrust_each.append(thrust1)
 
         for each_cluster in clusterFisInputs:
             ins = [['relative_heading', each_cluster[1]], ['distance', each_cluster[0]], ['closure_rate', each_cluster[2]]]
             [turn2, thrust2] = self.C1.compute2Plus(ins, ['turn_rate', 'thrust'])
-            turn_each.append(turn2)
+            turn_rate_each.append(turn2)
             thrust_each.append(thrust2)
 
-
-        ship.turn_rate = np.sum(turn_each)/len(turn_each)
-        if thrust_each:
-            thrust = np.sum(thrust_each)/len(thrust_each)
-
-        """if thrust > 0.2: ship.thrust = ship.thrust_range[1]
-        elif thrust < -0.2: ship.thrust = ship.thrust_range[0]
-        else: ship.thrust = 0"""
-
+        if turn_rate_each:
+            ship.turn_rate = sum(turn_rate_each)/len(turn_rate_each)
+            thrust = sum(thrust_each)/len(thrust_each)
+        else:
+            thrust = 0
+        if thrust > 0.15: ship.thrust = ship.thrust_range[1]
+        elif thrust < -0.15: ship.thrust = ship.thrust_range[0]
+        else: ship.thrust = 0
         ship.shoot()
