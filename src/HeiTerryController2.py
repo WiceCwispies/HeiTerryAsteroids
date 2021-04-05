@@ -223,9 +223,14 @@ class FuzzyController(ControllerBase):
         else:
             thrust = 0
 
-        if thrust > 0.075: ship.thrust = ship.thrust_range[1]
-        elif thrust < -0.075: ship.thrust = ship.thrust_range[0]
+        if thrust > 0.075:
+            ship.thrust = ship.thrust_range[1]
+        elif thrust < -0.075:
+            ship.thrust = ship.thrust_range[0]
         else: ship.thrust = 0
+
+        if abs(ship.velocity[1]) > 1.2 or abs(ship.velocity[0]) > 1.2:
+            ship.shoot()
 
         # try:
         #     message = ''

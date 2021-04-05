@@ -38,7 +38,7 @@ myCGA = CGA(NumberOfChrom = 20,
           NumbofGenes = 10,
           maxGen = 10,
           PC = 0.75,
-          PM = .1,
+          PM = 0,
           Er = 0.15,
           bounds = game)
 
