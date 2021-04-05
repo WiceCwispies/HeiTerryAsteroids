@@ -8,6 +8,23 @@ def asteriodInitialize(numbChroms, numbGenes, bounds):
         population.append(Chromosome(np.random.randint(3, size=(2, 54)).tolist()))
     return population
 
+def asteriodInitialize2(numbChroms, numbGenes, bounds):
+    population = []
+    for i in range(numbChroms):
+        population.append(Chromosome(np.random.randint(3, size=(2, 24)).tolist()))
+    return population
+
+def asteriodInitialize3(numbChroms, numbGenes, bounds):
+    population = []
+    for i in range(numbChroms):
+        population.append(Chromosome(np.random.randint(3, size=(1, 12)).tolist()))
+    return population
+
+def asteriodInitialize4(numbChroms, numbGenes, bounds):
+    population = []
+    for i in range(numbChroms):
+        population.append(Chromosome(np.random.randint(3, size=(1, 28)).tolist()))
+    return population
 # Generic CGA Initialization Function
 up = 7
 lw = -7

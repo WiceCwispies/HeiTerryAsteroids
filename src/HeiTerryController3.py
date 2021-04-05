@@ -29,14 +29,36 @@ class FuzzyController(ControllerBase):
                        1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0],
                       [1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0,
                        1, 0, 2, 0, 2, 1, 1, 0, 1, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 2, 0]]"""
+        self.S1 = HeiTerry_FIS()
+        chromosome = chromosome.getString()
+        rule_base = chromosome[0][24:28]
+
+        self.S1.add_input('average_distance', np.arange(0.0, 1.0, 0.1), [[-180.0, -180.0, 0.0], [-180.0, 0.0, 180.0]])
+        self.S1.add_input('invaders', np.arange(0.0, 1.0, 0.1), [[0.0, 0.0, 1.0], [0.0, 1.0, 1.0]])
+        shoot_mems = [[0.0, 0.1, 1.0],[0.2, 0.5, 0.8] ,[0.0, 0.9, 1.0]]
+        self.S1.add_output('shooting', np.arange(0.0, 1.0, 0.1), shoot_mems)
+
+        v_str = ['average_distance', 'invaders', 'shooting']
+        mfs3 = ['0', '1']
+        # Find a way to automate finding num rules per input earlier and for num inputs
+        rules_all = []
+        for wow in range(2):
+            for gee in range(2):
+                rules_all.append([[[v_str[0], mfs3[wow]], [v_str[1], mfs3[gee]]],
+                                  ['AND'], [[v_str[2], str(rule_base[(wow) + gee])]
+                                            ]])
+
+        self.S1.generate_mamdani_rule(rules_all)
 
         self.A1 = HeiTerry_FIS()
-        chromosome = chromosome.getString()
-        rule_base = chromosome[0]
-
-        self.A1.add_input('relative_heading', np.arange(-180.0, 180.0, 1.0), 3)
-        self.A1.add_input('distance', np.arange(0.0, 1.0, 0.1), 3)
-        self.A1.add_input('closure_rate', np.arange(-1.0, 1.0, 0.1), 3)
+        #chromosome = chromosome.getString()
+        rule_base = chromosome[0][0:24]
+        r_h_mems = [[-180, -180, -60], [-60, 0, 60], [60, 180, 180]]
+        d_mems = [[0, 0, .7], [.3, 1, 1]]
+        c_mems = [[-1, -1, .7], [0, 1, 1]]
+        self.A1.add_input('relative_heading', np.arange(-180.0, 180.0, 1.0), r_h_mems)
+        self.A1.add_input('distance', np.arange(0.0, 1.0, 0.1), d_mems)
+        self.A1.add_input('closure_rate', np.arange(-1.0, 1.0, 0.1), c_mems)
         turn_rate_mems = [[-180.0, -180.0, 0.0], [-180.0, 0.0, 180.0], [0.0, 180.0, 180.0]]
         thrust_mems = [[-1.0, -1.0, 0], [-0.5, 0, 0.5], [0.0, 1.0, 1.0]]
         self.A1.add_output('turn_rate', np.arange(-180.0, 180.0, 1.0), turn_rate_mems)
@@ -47,23 +69,25 @@ class FuzzyController(ControllerBase):
         # Find a way to automate finding num rules per input earlier and for num inputs
         rules_all = []
         for wow in range(3):
-            for gee in range(3): #2
-                for zoop in range(3): #2
+            for gee in range(2):
+                for zoop in range(2):
                     rules_all.append([[[v_str[0], mfs3[wow]], [v_str[1], mfs3[gee]], [v_str[2], mfs3[zoop]]],
-                                      ['AND'], [[v_str[3], str(rule_base[(wow * 3 * 3) + (gee * 3) + zoop])], # 2
-                                                [v_str[4], str(rule_base[27 + (wow * 3 * 3) + (gee * 3) + zoop])]]]) #12
+                                      ['AND'], [[v_str[3], str(rule_base[(wow * 2 * 2) + (gee * 2) + zoop])], # 2
+                                                [v_str[4], str(rule_base[12 + (wow * 2 * 2) + (gee * 2) + zoop])]]]) #12
 
 
         self.A1.generate_mamdani_rule(rules_all)
 
         # CLUSTER AVOIDANCE
         self.C1 = HeiTerry_FIS()
-        rule_base = chromosome[1]
+        rule_base = chromosome[0][0:24]
         # -180 -60 -60 60 60 180
-        r_h = [[-180,]]
-        self.C1.add_input('relative_heading', np.arange(-180.0, 180.0, 1.0), 3)
-        self.C1.add_input('distance', np.arange(0.0, 1.0, 0.1), 3) # 2
-        self.C1.add_input('closure_rate', np.arange(-1.0, 1.0, 0.1), 3) # 2 change shape.
+        r_h_mems = [[-180, -180, -60], [-60, 0, 60], [60, 180, 180]]
+        self.C1.add_input('relative_heading', np.arange(-180.0, 180.0, 1.0), r_h_mems)
+        d_mems = [[0,0,.7], [.3,1,1]]
+        self.C1.add_input('distance', np.arange(0.0, 1.0, 0.1), d_mems) # 2
+        c_mems = [[-1, -1, .7], [0,1,1]]
+        self.C1.add_input('closure_rate', np.arange(-1.0, 1.0, 0.1), c_mems) # 2 change shape.
         turn_rate_mems = [[-180.0, -180.0, 0.0], [-180.0, 0.0, 180.0], [0.0, 180.0, 180.0]]
         thrust_mems = [[-1.0, -1.0, 0], [-0.5, 0, 0.5], [0.0, 1.0, 1.0]]
         self.C1.add_output('turn_rate', np.arange(-180.0, 180.0, 1.0), turn_rate_mems)
@@ -74,11 +98,11 @@ class FuzzyController(ControllerBase):
         # Find a way to automate finding num rules per input earlier and for num inputs
         rules_all = []
         for wow in range(3):
-            for gee in range(3):
-                for zoop in range(3):
+            for gee in range(2):
+                for zoop in range(2):
                     rules_all.append([[[v_str[0], mfs3[wow]], [v_str[1], mfs3[gee]], [v_str[2], mfs3[zoop]]],
-                                      ['AND'], [[v_str[3], str(rule_base[(wow * 3 * 3) + (gee * 3) + zoop])],
-                                                [v_str[4], str(rule_base[27 + (wow * 3 * 3) + (gee * 3) + zoop])]]])
+                                      ['AND'], [[v_str[3], str(rule_base[(wow * 2 * 2) + (gee * 2) + zoop])],
+                                                [v_str[4], str(rule_base[12 + (wow * 2 * 2) + (gee * 2) + zoop])]]])
 
         self.C1.generate_mamdani_rule(rules_all)
 
@@ -204,9 +228,7 @@ class FuzzyController(ControllerBase):
             turn_rate_each.append(turn1)
             thrust_each.append(thrust1)
             l_output = self.linguistify_output(turn_rate_each[0], thrust_each[0])
-        print(l_Variables)
 
-        print(l_output)
         for each_cluster in clusterFisInputs:
             ins = [['relative_heading', each_cluster[1]-180], ['distance', each_cluster[0]/500], ['closure_rate', each_cluster[2]]]
             [turn2, thrust2] = self.C1.compute2Plus(ins, ['turn_rate', 'thrust'])
@@ -221,25 +243,46 @@ class FuzzyController(ControllerBase):
         if thrust > 0.075: ship.thrust = ship.thrust_range[1]
         elif thrust < -0.075: ship.thrust = ship.thrust_range[0]
         else: ship.thrust = 0
-        try:
-            message = ''
-            for l in l_Variables:
-                message = message + ' ' + l[0] + ' ' + l[1] + ' ' + l[2]
-            for l in l_output:
-                message = message + ' ' + l
 
-            if message != '':
-                print(message)
+        distance_total = 0
+        invaders = 0
+        avoidanceFisInputs = []
+        for c in circles:
+            if c[2] == 1:
+                for asteriod in asteriods:
+                    if distanceFormula(asteriod[0], c[0]) < c[1]:
+                        avoidanceFisInputs.append(findFISInputs(c, ship, asteriod))
+                        invaders += 1
+                        distance_total += distanceFormula(asteriod[0], c[0]) / 150
 
-            host = '127.0.0.1'
-            port = 65432
-            server_addr = (host, port)
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.setblocking(False)
-            sock.connect_ex(server_addr)
-            sock.send(str.encode(message))
-            sock.close()
-        except:
-            pass
+        shootingFisInputs = [distance_total / len(asteriods), invaders / len(asteriods)]
 
-        ship.shoot()
+        shoot = self.S1.compute([['average_distance', shootingFisInputs[0]], ['invaders', shootingFisInputs[1]]], 'shooting')
+
+        if shoot > 0.3: ship.shoot()
+
+        # try:
+        #     message = ''
+        #     for l in l_Variables:
+        #         message = message + ' ' + l[0] + ' ' + l[1] + ' ' + l[2]
+        #     for l in l_output:
+        #         message = message + ' ' + l
+        #
+        #     if message != '':
+        #         print(message)
+        #
+        #     host = '127.0.0.1'
+        #     port = 65432
+        #     server_addr = (host, port)
+        #     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #     sock.setblocking(False)
+        #     sock.connect_ex(server_addr)
+        #     sock.send(str.encode(message))
+        #     sock.close()
+        # except:
+        #     pass
+
+        #ship.shoot()
+
+    # astreoids velocity
+    # How many asteriods are in your circle / total
