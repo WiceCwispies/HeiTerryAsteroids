@@ -16,9 +16,9 @@ def createUniformInput(numbInputs,numbMems,lbs,ubs,show):
                         
             # create membership functions
             for i,mem in enumerate(range(numbMems)):
-                a = (div*i) - div + lbs[n] + random.uniform(-1,1)
-                b = div*i + lbs[n] + random.uniform(-1,1)
-                c = (div*i) + div + lbs[n] + random.uniform(-1,1)
+                a = (div*i) - div + lbs[n]
+                b = div*i + lbs[n]
+                c = (div*i) + div + lbs[n]
                 inputMatrix[n].append([a,b,c])  
         if show:
             plotMembershipFunctions(inputMatrix[0])
@@ -70,7 +70,9 @@ class antecedent():
         '''
         lenBounds = len(bounds)
         if lenBounds == 3:
-            classifiers = ['0','1','2']
+            classifiers = ['0', '1', '2']
+        elif lenBounds == 2:
+            classifiers = ['0', '1']
         
         for i,mf in enumerate(classifiers):
             self.mfs[mf] = bounds[i]
@@ -95,6 +97,8 @@ class Consequent():
         mems = createUniformInput(1, numb, [self.range[0]], [self.range[-1]], False)[0]
         if numb == 3:
             classifires = ['0', '1', '2']
+        elif numb == 2:
+            classifires = ['0', '1']
         
         for i,mf in enumerate(classifires):
             self.mfs[mf] = mems[i]
@@ -106,6 +110,8 @@ class Consequent():
         lenBounds = len(bounds)
         if lenBounds == 3:
             classifiers = ['0','1','2']
+        elif lenBounds == 2:
+            classifiers = ['0', '1']
         
         for i,mf in enumerate(classifiers):
             self.mfs[mf] = bounds[i]

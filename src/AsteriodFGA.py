@@ -10,15 +10,16 @@ from GA.crossoverFunctions import *
 from GA.mutationFunctions import *
 from GA.elitismFunctions import *
 from GA.continousGeneticAlgorithm import CGA
-from HeiTerryController import FuzzyController
+from HeiTerryController3 import FuzzyController
 from sample_score import SampleScore
 from shapely import speedups
 from GA.chromosome import *
 from fuzzy_asteroids.util import Scenario
 
-
 settings = {
-    "real_time_multiplier": 2,
+    #"real_time_multiplier": 3,
+    "lives": 1,
+    "time_limit": 150
 }
 
 scenario_ast = Scenario(
@@ -35,13 +36,13 @@ game = TrainerEnvironment(settings=settings)
 
 myCGA = CGA(NumberOfChrom = 20,
           NumbofGenes = 10,
-          maxGen = 100,
+          maxGen = 10,
           PC = 0.75,
-          PM = 0.20,
+          PM = 0,
           Er = 0.15,
           bounds = game)
 
-myCGA.initialization(asteriodInitialize)
+myCGA.initialization(asteriodInitialize4)
 
 def AsteriodFitness(chrom, bounds):
     # settings = {
@@ -49,7 +50,7 @@ def AsteriodFitness(chrom, bounds):
     #     # "sound_on": False,
     #     # "frequency": 60,
     #     "real_time_multiplier": 2,
-    #     # "lives": 3,
+    #     "lives": 1,
     #     # "prints": True,
     #     # "allow_key_presses": False
     # }
@@ -59,10 +60,10 @@ def AsteriodFitness(chrom, bounds):
     return score.fitness
 
 myCGA.run(selectionFunction = basicSelection,
-        crossoverFunction = AsteriodsCrossoverRand1Point,
+        crossoverFunction = AsteriodsCrossoverRand1Point2,
         mutationFunction = asteriodMutation,
         fitnessFunction = AsteriodFitness,
-        elitismFunction = basicElitism)
+        elitismFunction = ElitismTest)
 
 best = myCGA.getBestChromosome()
 
